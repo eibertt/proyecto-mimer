@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <script src='//libtl.com/sdk.js' data-zone='10662247' data-sdk='show_10662247'></script>  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TecnoHoy Clicker</title>
+    <style>
+        body { background: #1a1a1a; color: white; font-family: sans-serif; text-align: center; margin: 0; overflow: hidden; }
+        .header { padding: 20px; font-size: 24px; color: #f39c12; font-weight: bold; }
+        .score-container { font-size: 40px; margin-top: 10px; }
+        
+        /* El botón principal (Hámster) */
+        .clicker-btn {
+            width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(#f1c40f, #e67e22);
+            border: 8px solid #d35400; cursor: pointer; margin: 50px auto;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 80px; transition: transform 0.1s;
+            user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        .clicker-btn:active { transform: scale(0.95); }
+
+        /* Sección de Tareas para Monetag */
+        .tasks { background: #2c3e50; padding: 20px; border-top-left-radius: 20px; border-top-right-radius: 20px; position: absolute; bottom: 0; width: 100%; box-sizing: border-box; }
+        .task-item { background: #34495e; padding: 10px; margin: 10px 0; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .task-btn { background: #27ae60; color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="header">TECNO-HOY COIN</div>
+    
+    <div class="score-container">
+        🪙 <span id="score">0</span>
+    </div>
+
+    <div class="clicker-btn" onclick="addCoin()">💎</div>
+
+    <div class="tasks">
+        <h3>Misiones Diarias (Gana +1,000)</h3>
+        
+        <div class="task-item">
+            <span>Ver truco secreto</span>
+            <a href="" target="_blank" class="task-btn" onclick="reward()">IR</a>
+        </div>
+
+        <div class="task-item">
+            <span>Diamantes Gratis</span>
+            <a href="TU_DIRECT_LINK_AQUI" target="_blank" class="task-btn" onclick="reward()">IR</a>
+        </div>
+    </div>
+
+    <script>
+        let count = 0;
+        const scoreDisplay = document.getElementById('score');
+
+        // Función para sumar monedas al hacer clic
+        function addCoin() {
+            count++;
+            scoreDisplay.innerText = count;
+        }
+
+        // Función que daría el premio tras ver el anuncio
+        function reward() {
+// Rewarded interstitial
+
+show_10662247().then(() => {
+    // You need to add your user reward function here, which will be executed after the user watches the ad.
+    // For more details, please refer to the detailed instructions.
+    alert('You have seen an ad!');
+})
+
+        
+            alert("¡Regresa después de completar la tarea para reclamar tu bono!");
+            count += 1000;
+            scoreDisplay.innerText = count;
+        }
+    </script>
+
+</body>
+</html>
