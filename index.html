@@ -3,344 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>TecnoHoy Cyber Tiger</title>
+    <title>TecnoHoy Cyber Tiger Ranking</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Paleta de colores Ciberpunk/Neón */
-            --bg-color: #050509; /* Negro azulado muy oscuro */
-            --text-color: #ffffff;
             --neon-blue: #00f2fe;
             --neon-magenta: #ff00ff;
-            --neon-cyan: #0ff;
             --neon-gold: #f1c40f;
-            --container-bg: #11111d; /* Gris azulado oscuro */
-            --border-neon: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
-            --border-magenta: 0 0 10px var(--neon-magenta), 0 0 20px var(--neon-magenta);
+            --bg-dark: #050509;
         }
 
-        body { 
-            background: var(--tg-theme-bg-color, var(--bg-color)); 
-            color: var(--tg-theme-text-color, var(--text-color)); 
-            font-family: 'Orbitron', 'Segoe UI', sans-serif; /* Fuente futurista opcional */
-            text-align: center; 
-            margin: 0; 
-            overflow: hidden; 
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
+        body { background: var(--bg-dark); color: white; font-family: 'Orbitron', sans-serif; text-align: center; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
-        /* Cabecera Neón */
-        .header { 
-            padding: 15px; 
-            font-size: 18px; 
-            color: var(--neon-blue); 
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            border-bottom: 1px solid #333;
-            text-shadow: 0 0 5px var(--neon-blue);
-        }
+        .header { padding: 10px; color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); font-size: 10px; display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); }
+        
+        .score-container { font-size: 42px; margin: 15px 0; color: var(--neon-gold); text-shadow: 0 0 15px rgba(241, 196, 15, 0.4); }
 
-        /* Marcador de Puntos Principal con Resplandor */
-        .score-container { 
-            font-size: 48px; 
-            font-weight: 800;
-            margin: 20px 0 10px 0;
-            color: var(--neon-gold);
-            text-shadow: 0 0 15px var(--neon-gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
+        .energy-container { width: 70%; margin: 5px auto; background: #222; height: 8px; border-radius: 10px; border: 1px solid var(--neon-blue); overflow: hidden; }
+        .energy-bar { background: linear-gradient(90deg, var(--neon-blue), var(--neon-magenta)); height: 100%; width: 100%; transition: width 0.2s; }
 
-        /* Marcador de Daño por Segundo (DPS) */
-        .dps-container {
-            font-size: 14px;
-            color: #27ae60;
-            margin-bottom: 20px;
-            font-weight: bold;
-            text-shadow: 0 0 5px #27ae60;
-        }
+        .main-view { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; position: relative; }
+        .ranking-view { display: none; flex-grow: 1; padding: 20px; overflow-y: auto; }
 
-        /* Área de Combate (Centro de Acción) */
-        .combat-zone {
-            flex-grow: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 10px;
-            padding: 20px;
-            position: relative;
-        }
-
-        /* Zonas de Toque para Ataque/Defensa */
-        .tap-zone {
-            background: rgba(255, 255, 255, 0.03);
-            border: 2px solid #333;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: background 0.1s, border-color 0.1s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tap-zone:active {
-            background: rgba(var(--neon-blue-rgb), 0.1);
-            border-color: var(--neon-blue);
-            box-shadow: var(--border-neon);
-        }
-
-        /* El Tigre Ciberpunk (Centro de la Zona de Combate) */
         .cyber-tiger {
-            grid-column: 1 / -1;
-            grid-row: 1 / -1;
-            width: 200px; 
-            height: 200px; 
-            margin: auto;
-            background-image: url('URL_DE_TU_IMAGEN_DE_TIGRE_CIBERPUNK'); /* Reemplaza esta URL */
-            background-size: cover;
-            background-position: center;
-            border-radius: 50%;
-            border: 5px solid var(--neon-magenta);
-            box-shadow: var(--border-magenta);
-            z-index: 5;
-            pointer-events: none; /* No interfiere con los clics en las zonas */
-            transition: transform 0.05s ease-out;
+            width: 240px; height: 240px; margin: 0 auto;
+            background-image: url('https://i.ibb.co/pP3V2mP/cyber-tiger.png');
+            background-size: cover; background-position: center;
+            border-radius: 50%; border: 4px solid var(--neon-magenta);
+            box-shadow: 0 0 30px var(--neon-magenta);
+            transition: transform 0.05s;
         }
+        .cyber-tiger:active { transform: scale(0.92); }
 
-        /* Animación de Daño al Tigre */
-        .cyber-tiger.damaged {
-            animation: shake 0.3s;
-        }
+        .nav-tabs { display: flex; background: #11111d; border-top: 2px solid var(--neon-blue); }
+        .tab { flex: 1; padding: 15px; font-size: 12px; color: #888; cursor: pointer; transition: 0.3s; }
+        .tab.active { color: var(--neon-blue); background: rgba(0, 242, 254, 0.1); font-weight: bold; }
 
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
-        }
-
-        /* Efectos Visuales de Impacto (Partículas Neón) */
-        .hit-effect {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: var(--neon-cyan);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--neon-cyan);
-            pointer-events: none;
-            animation: ping 0.5s ease-out forwards;
-        }
-
-        @keyframes ping {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(4); opacity: 0; }
-        }
-
-        /* Panel de Mejoras Profesional */
-        .upgrades-panel { 
-            background: var(--tg-theme-secondary-bg-color, var(--container-bg)); 
-            padding: 20px; 
-            border-radius: 25px 25px 0 0; 
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.7);
-            border-top: 1px solid var(--border-color);
-        }
-
-        .upgrades-header {
-            margin-top: 0; 
-            font-size: 16px; 
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 15px;
-        }
-
-        .upgrade-item { 
-            background: rgba(255,255,255,0.02); 
-            padding: 15px; 
-            margin: 8px 0; 
-            border-radius: 12px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border: 1px solid var(--border-color);
-            transition: border-color 0.2s;
-        }
-
-        .upgrade-item:hover {
-            border-color: var(--neon-magenta);
-        }
-
-        .upgrade-info {
-            text-align: left;
-        }
-
-        .upgrade-title {
-            font-weight: bold;
-            font-size: 15px;
-            color: var(--text-color);
-        }
-
-        .upgrade-cost {
-            font-size: 12px; 
-            color: var(--neon-gold);
-            font-weight: bold;
-        }
-
-        .upgrade-btn { 
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); /* Gris oscuro profesional */
-            color: white; 
-            text-decoration: none; 
-            padding: 10px 22px; 
-            border-radius: 8px; 
-            font-weight: bold;
-            font-size: 13px;
-            border: 1px solid #555;
-            transition: background 0.2s, box-shadow 0.2s;
-        }
-
-        .upgrade-btn:active {
-            background: linear-gradient(135deg, #1a252f 0%, #2c3e50 100%);
-            box-shadow: var(--border-magenta);
-        }
+        .rank-item { display: flex; justify-content: space-between; background: rgba(255,255,255,0.05); margin-bottom: 8px; padding: 12px; border-radius: 10px; border: 1px solid #222; }
+        .rank-pos { color: var(--neon-magenta); font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="header">⚡ TECNO-HOY CYBER TIGER ⚡</div>
+    <div class="header">
+        <span>📶 SERVER: BARINAS_VNZ</span>
+        <span>⚡ LATENCY: 24ms</span>
+    </div>
     
-    <div class="score-container">
-        <span id="score">0</span>
-    </div>
+    <div class="score-container" id="score">0</div>
 
-    <div class="dps-container">
-        Daño por segundo: +<span id="dpsScore">0</span> 💥
-    </div>
-
-    <div class="combat-zone">
-        <div class="tap-zone" onclick="handleCombatTap(event, 'attack')"></div>
-        <div class="tap-zone" onclick="handleCombatTap(event, 'defend')"></div>
-        <div class="tap-zone" onclick="handleCombatTap(event, 'attack')"></div>
-        <div class="tap-zone" onclick="handleCombatTap(event, 'defend')"></div>
-        
+    <div id="gameView" class="main-view">
+        <div style="font-size: 9px; color: var(--neon-blue); margin-bottom: 5px;">POTENCIA DE ATAQUE</div>
+        <div class="energy-container"><div class="energy-bar" id="energyBar"></div></div>
         <div class="cyber-tiger" id="tiger"></div>
+        <p style="font-size: 11px; color: #555; margin-top: 15px;">TOCA PARA ATACAR</p>
     </div>
 
-    <div class="upgrades-panel">
-        <h3 class="upgrades-header">Mejoras de Combate</h3>
-        
-        <div class="upgrade-item">
-            <div class="upgrade-info">
-                <div class="upgrade-title">Potenciar Garras Neón</div>
-                <div class="upgrade-cost">Costo: 500 monedas</div>
-            </div>
-            <a href="#" class="upgrade-btn" onclick="buyUpgrade(500, 'Garras Neón', 1)">MEJORAR</a>
+    <div id="rankingView" class="ranking-view">
+        <h2 style="color: var(--neon-blue); font-size: 18px;">TOP GUERREROS</h2>
+        <div class="rank-item"><span class="rank-pos">#1</span> <span>Cyber_Boss</span> <span>9.5M</span></div>
+        <div class="rank-item"><span class="rank-pos">#2</span> <span>Pixel_Hunter</span> <span>5.2M</span></div>
+        <div class="rank-item"><span class="rank-pos">#3</span> <span>Venz_Warrior</span> <span>1.8M</span></div>
+        <div class="rank-item" style="border: 1px solid var(--neon-gold);">
+            <span style="color:var(--neon-gold)">TU</span> <span id="userName">Jugador</span> <span id="userRankScore">0</span>
         </div>
+    </div>
 
-        <div class="upgrade-item">
-            <div class="upgrade-info">
-                <div class="upgrade-title">Escudo de Plasma Ciber</div>
-                <div class="upgrade-cost">Costo: 2,500 monedas</div>
-            </div>
-            <a href="#" class="upgrade-btn" onclick="buyUpgrade(2500, 'Escudo Plasma', 5)">MEJORAR</a>
-        </div>
+    <div class="nav-tabs">
+        <div class="tab active" onclick="showView('game')">COMBATE</div>
+        <div class="tab" onclick="showView('rank')">RANKING</div>
+        <div class="tab" onclick="window.open('TU_LINK_MONETAG_AQUI')">BONUS</div>
     </div>
 
     <script>
-        // --- INICIALIZACIÓN DE TELEGRAM WEBAPP ---
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Expande la miniapp a pantalla completa
+        let pts = parseInt(localStorage.getItem('cyberPts')) || 0;
+        let energy = 100;
 
-        // --- LÓGICA DEL JUEGO ---
-        let count = parseInt(localStorage.getItem('tecnoScore')) || 0;
-        let dps = parseInt(localStorage.getItem('tecnoDPS')) || 0; // Damage Per Second (Minería pasiva)
-        let tapDamage = 1; // Daño por cada toque inicial
+        function update() {
+            document.getElementById('score').innerText = pts.toLocaleString();
+            document.getElementById('userRankScore').innerText = pts.toLocaleString();
+            document.getElementById('energyBar').style.width = energy + '%';
+            localStorage.setItem('cyberPts', pts);
+        }
 
-        const scoreDisplay = document.getElementById('score');
-        const dpsDisplay = document.getElementById('dpsScore');
-        const tiger = document.getElementById('tiger');
-
-        // Actualizar visualización inicial
-        updateVisuals();
-
-        // --- FUNCIÓN PRINCIPAL DE COMBATE TRAS TOQUE ---
-        function handleCombatTap(event, type) {
-            count += tapDamage; // Sumar daño por toque
-            updateVisuals();
-            
-            // 1. Vibración Táctil (Haptic Feedback)
-            if (tg.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred(type === 'attack' ? 'medium' : 'light');
+        document.getElementById('tiger').addEventListener('click', (e) => {
+            if (energy >= 2) {
+                pts += 15; energy -= 2; update();
+                if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
             }
+        });
 
-            // 2. Efecto visual de daño al tigre (Sacudida)
-            tiger.classList.add('damaged');
-            setTimeout(() => tiger.classList.remove('damaged'), 300);
-
-            // 3. Crear efecto visual de impacto (Partículas Neón)
-            createHitEffect(event.clientX, event.clientY);
+        function showView(v) {
+            document.getElementById('gameView').style.display = v === 'game' ? 'flex' : 'none';
+            document.getElementById('rankingView').style.display = v === 'rank' ? 'block' : 'none';
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                t.classList.toggle('active', (i === 0 && v === 'game') || (i === 1 && v === 'rank'));
+            });
         }
 
-        // --- LÓGICA DE MINERÍA PASIVA (DPS) ---
-        // Esta función suma puntos automáticamente cada segundo
-        setInterval(() => {
-            if (dps > 0) {
-                count += dps / 3600; // Fracción por segundo del DPS total
-                updateVisuals();
-            }
-        }, 1000); // Se ejecuta cada segundo
-
-        // --- FUNCIONES AUXILIARES ---
-        // Actualiza el marcador y guarda los datos localmente
-        function updateVisuals() {
-            scoreDisplay.innerText = Math.floor(count).toLocaleString('es-ES'); // Formato profesional (1.000)
-            dpsDisplay.innerText = dps.toLocaleString('es-ES');
-            localStorage.setItem('tecnoScore', count);
-            localStorage.setItem('tecnoDPS', dps);
-        }
-
-        // Crea el efecto visual de partículas neón en la posición del clic
-        function createHitEffect(x, y) {
-            const effect = document.createElement('div');
-            effect.className = 'hit-effect';
-            
-            // Ajustar la posición para que el efecto salga del centro del dedo
-            effect.style.left = (x - 5) + 'px';
-            effect.style.top = (y - 5) + 'px';
-            
-            document.querySelector('.combat-zone').appendChild(effect);
-
-            // Eliminar el elemento después de que termine la animación (0.5s)
-            setTimeout(() => effect.remove(), 500);
-        }
-
-        // Función para comprar mejoras y potenciar los robots de combate
-        function buyUpgrade(cost, upgradeName, dpsIncrease) {
-            if (count >= cost) {
-                count -= cost;
-                dps += dpsIncrease;
-                updateVisuals();
-                if (tg.showAlert) {
-                    tg.showAlert(`¡Mejora exitosa! Has adquirido ${upgradeName}. Tu DPS ha aumentado en ${dpsIncrease}.`);
-                }
-            } else {
-                if (tg.showAlert) {
-                    tg.showAlert("No tienes suficientes monedas para esta mejora.");
-                }
-            }
-        }
+        setInterval(() => { if(energy < 100) { energy += 1; update(); } }, 1000);
+        
+        tg.expand();
+        update();
     </script>
 </body>
 </html>
