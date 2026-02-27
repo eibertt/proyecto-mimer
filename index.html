@@ -3,139 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Tiger Kombat Elite</title>
+    <title>Tiger Kombat Elite v5.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
     <style>
-        :root { --cyan: #00f2fe; --magenta: #bc13fe; --gold: #ffcc00; --bg: #050508; }
+        :root { --cyan: #00f2fe; --magenta: #bc13fe; --gold: #ffcc00; --dark: #0a0a0c; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            margin: 0; background: var(--bg); color: white;
+            margin: 0; background-color: var(--dark); color: white;
             font-family: 'Rajdhani', sans-serif; overflow: hidden; height: 100vh;
             display: flex; flex-direction: column; align-items: center;
         }
-        .header { display: flex; gap: 10px; padding: 15px; width: 90%; }
-        .card {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--cyan);
-            border-radius: 12px; padding: 10px; flex: 1; text-align: center;
+        /* Top Stats */
+        .header { display: flex; width: 95%; gap: 10px; margin-top: 15px; }
+        .stat-box {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(0,242,254,0.2);
+            border-radius: 15px; flex: 1; padding: 10px; text-align: center;
         }
-        .card small { display: block; font-size: 10px; color: var(--cyan); text-transform: uppercase; }
-        .card b { font-family: 'Orbitron'; font-size: 14px; }
-        
-        .balance {
-            font-family: 'Orbitron'; font-size: 55px; color: var(--gold);
-            text-shadow: 0 0 25px rgba(255, 204, 0, 0.5); margin: 25px 0;
+        .stat-box span { display: block; font-size: 10px; color: var(--cyan); text-transform: uppercase; }
+        .stat-box b { font-family: 'Orbitron'; font-size: 14px; }
+
+        /* Balance */
+        .balance-container { margin: 30px 0; text-align: center; }
+        .balance-amount {
+            font-family: 'Orbitron'; font-size: 50px; font-weight: 900;
+            color: var(--gold); text-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
         }
 
-        .tiger-container {
+        /* Main Interaction Area */
+        .game-area {
             position: relative; flex-grow: 1; display: flex; align-items: center; justify-content: center;
+            width: 100%;
         }
-        .tiger-circle {
-            width: 270px; height: 270px; border-radius: 50%;
-            border: 6px solid var(--cyan); box-shadow: 0 0 40px var(--cyan), inset 0 0 20px var(--cyan);
-            cursor: pointer; transition: transform 0.1s;
-            background: #000; display: flex; align-items: center; justify-content: center;
-            overflow: hidden; z-index: 5;
-        }
-        .tiger-circle:active { transform: scale(0.92); }
-        .tiger-circle img { width: 100%; height: 100%; object-fit: cover; }
-
         .aura {
-            width: 330px; height: 330px; position: absolute; border-radius: 50%;
-            background: radial-gradient(circle, rgba(188, 19, 254, 0.25) 0%, transparent 70%);
-            animation: pulse 2s infinite;
+            position: absolute; width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(188, 19, 254, 0.2) 0%, transparent 70%);
+            animation: pulse 2s infinite ease-in-out;
         }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 0.5; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.15); opacity: 0.8; } }
 
-        .footer { width: 90%; padding-bottom: 40px; }
-        .energy-bar {
-            height: 14px; background: #1a1a1a; border-radius: 10px;
-            border: 1px solid #333; overflow: hidden; margin-top: 8px;
+        .clicker-btn {
+            width: 260px; height: 260px; border-radius: 50%;
+            background: #000; border: 4px solid var(--cyan);
+            box-shadow: 0 0 30px var(--cyan); cursor: pointer;
+            z-index: 10; display: flex; align-items: center; justify-content: center;
+            transition: transform 0.05s; position: relative;
         }
-        .energy-fill {
-            height: 100%; width: 100%; background: linear-gradient(90deg, var(--magenta), var(--cyan));
+        .clicker-btn:active { transform: scale(0.94); }
+        .clicker-btn svg { width: 180px; height: 180px; fill: var(--cyan); filter: drop-shadow(0 0 10px var(--cyan)); }
+
+        /* Energy & Footer */
+        .footer { width: 90%; padding-bottom: 30px; }
+        .energy-info { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
+        .bar-bg { height: 14px; background: #1a1a1a; border-radius: 10px; overflow: hidden; border: 1px solid #333; }
+        .bar-fill { 
+            height: 100%; width: 100%; 
+            background: linear-gradient(90deg, var(--magenta), var(--cyan));
             box-shadow: 0 0 10px var(--cyan); transition: width 0.2s;
         }
 
-        .floating-tap {
+        /* Floating Numbers */
+        .pop {
             position: absolute; color: white; font-family: 'Orbitron'; font-weight: 900;
-            font-size: 32px; pointer-events: none; animation: fly 0.8s ease-out forwards;
-            z-index: 100; text-shadow: 0 0 10px var(--cyan);
+            font-size: 30px; pointer-events: none; animation: flyUp 0.7s forwards;
+            text-shadow: 0 0 8px var(--cyan); z-index: 50;
         }
-        @keyframes fly { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-140px); opacity: 0; } }
+        @keyframes flyUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-130px); opacity: 0; } }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="card"><small>Ataque</small><b>+25</b></div>
-        <div class="card"><small>Profit/H</small><b style="color:var(--gold)">+12.8K</b></div>
+        <div class="stat-box"><span>Profit/Tap</span><b>+25</b></div>
+        <div class="stat-box"><span>Auto/H</span><b style="color:var(--gold)">+10.5K</b></div>
     </div>
 
-    <div class="balance" id="coins">0</div>
+    <div class="balance-container">
+        <div class="balance-amount" id="balance">0</div>
+    </div>
 
-    <div class="tiger-container">
+    <div class="game-area">
         <div class="aura"></div>
-        <div class="tiger-circle" id="tapBtn">
-             <div class="tiger-circle" id="tapBtn">
-    <img src="https://www.svgrepo.com/show/418593/tiger.svg" 
-         onerror="this.src='https://cdn-icons-png.flaticon.com/512/616/616412.png'" 
-         alt="Tiger">
-</div>
-
-                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/1998/1998810.png'" 
-                 alt="Tiger">
+        <div class="clicker-btn" id="mainBtn">
+            <svg viewBox="0 0 24 24">
+                <path d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10,10-4.48,10-10S17.52,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8 S16.41,20,12,20z M11,7l-5,5l1.41,1.41L11,9.83V17h2V9.83l3.59,3.58L18,12L12,6V7z"/>
+            </svg>
         </div>
     </div>
 
     <div class="footer">
-        <div style="display:flex; justify-content:space-between; font-size:13px; font-weight: bold;">
+        <div class="energy-info">
             <span>⚡ ENERGÍA ALPHA</span>
-            <span id="energyText">1500 / 1500</span>
+            <span id="energyLabel">1000 / 1000</span>
         </div>
-        <div class="energy-bar"><div class="energy-fill" id="energyBar"></div></div>
+        <div class="bar-bg"><div class="bar-fill" id="energyBar"></div></div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
+        tg.ready(); // Notifica a Telegram que la app está lista
         tg.expand();
 
-        let data = {
-            coins: parseInt(localStorage.getItem('tiger_v4_coins')) || 0,
-            energy: 1500,
-            maxEnergy: 1500
+        let gameState = {
+            coins: parseFloat(localStorage.getItem('tk_v5_coins')) || 0,
+            energy: 1000,
+            maxEnergy: 1000,
+            tapValue: 25
         };
 
-        function sync() {
-            document.getElementById('coins').innerText = Math.floor(data.coins).toLocaleString();
-            document.getElementById('energyBar').style.width = (data.energy / data.maxEnergy * 100) + '%';
-            document.getElementById('energyText').innerText = `${data.energy} / ${data.maxEnergy}`;
-            localStorage.setItem('tiger_v4_coins', data.coins);
+        function updateUI() {
+            document.getElementById('balance').innerText = Math.floor(gameState.coins).toLocaleString();
+            document.getElementById('energyBar').style.width = (gameState.energy / gameState.maxEnergy * 100) + '%';
+            document.getElementById('energyLabel').innerText = `${Math.floor(gameState.energy)} / ${gameState.maxEnergy}`;
+            localStorage.setItem('tk_v5_coins', gameState.coins);
         }
 
-        document.getElementById('tapBtn').addEventListener('click', (e) => {
-            if (data.energy >= 5) {
-                data.coins += 25;
-                data.energy -= 5;
-                tg.HapticFeedback.impactOccurred('heavy');
+        document.getElementById('mainBtn').addEventListener('touchstart', (e) => {
+            if (gameState.energy >= 5) {
+                gameState.coins += gameState.tapValue;
+                gameState.energy -= 5;
+                
+                tg.HapticFeedback.impactOccurred('medium');
 
-                const t = document.createElement('div');
-                t.innerText = '+25';
-                t.className = 'floating-tap';
-                t.style.left = e.clientX + 'px';
-                t.style.top = e.clientY + 'px';
-                document.body.appendChild(t);
-                setTimeout(() => t.remove(), 800);
-                sync();
+                // Número flotante
+                const touch = e.touches[0];
+                const pop = document.createElement('div');
+                pop.innerText = `+${gameState.tapValue}`;
+                pop.className = 'pop';
+                pop.style.left = touch.clientX + 'px';
+                pop.style.top = touch.clientY + 'px';
+                document.body.appendChild(pop);
+                setTimeout(() => pop.remove(), 700);
+                
+                updateUI();
+            } else {
+                tg.HapticFeedback.notificationOccurred('error');
             }
         });
 
+        // Ganancia pasiva y recarga de energía
         setInterval(() => {
-            if(data.energy < data.maxEnergy) data.energy += 3;
-            data.coins += (12800 / 3600);
-            sync();
+            if(gameState.energy < gameState.maxEnergy) gameState.energy += 2;
+            gameState.coins += (10500 / 3600);
+            updateUI();
         }, 1000);
 
-        sync();
+        updateUI();
     </script>
 </body>
 </html>
