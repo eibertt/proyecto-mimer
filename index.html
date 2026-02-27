@@ -3,159 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Tiger Kombat - Official Mini App</title>
+    <title>Tiger Kombat Elite</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --neon-blue: #00d2ff;
-            --neon-purple: #9d50bb;
-            --gold: #fbc02d;
-            --dark-bg: #050505;
-        }
-
+        :root { --cyan: #00f2fe; --magenta: #bc13fe; --gold: #ffcc00; --bg: #050508; }
         body {
-            margin: 0; background: var(--dark-bg); color: white;
+            margin: 0; background: var(--bg); color: white;
             font-family: 'Rajdhani', sans-serif; overflow: hidden; height: 100vh;
             display: flex; flex-direction: column; align-items: center;
         }
-
-        /* Stats Superiores - Inspirado en tus capturas */
-        .header-stats {
-            display: flex; gap: 10px; padding: 15px; width: 90%; justify-content: center;
+        .header { display: flex; gap: 10px; padding: 15px; width: 90%; }
+        .card {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--cyan);
+            border-radius: 12px; padding: 10px; flex: 1; text-align: center;
         }
-        .stat-card {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(0,210,255,0.3);
-            border-radius: 12px; padding: 8px 15px; text-align: center; flex: 1;
-        }
-        .stat-card small { display: block; font-size: 10px; color: var(--neon-blue); text-transform: uppercase; }
-        .stat-card b { font-family: 'Orbitron'; font-size: 14px; color: white; }
-
-        /* Contador de Monedas Principal */
-        .main-balance {
-            font-family: 'Orbitron'; font-size: 55px; font-weight: 900;
-            color: var(--gold); text-shadow: 0 0 25px rgba(251, 192, 45, 0.5);
-            margin: 20px 0;
+        .card small { display: block; font-size: 10px; color: var(--cyan); text-transform: uppercase; }
+        .card b { font-family: 'Orbitron'; font-size: 14px; }
+        
+        .balance {
+            font-family: 'Orbitron'; font-size: 55px; color: var(--gold);
+            text-shadow: 0 0 25px rgba(255, 204, 0, 0.5); margin: 25px 0;
         }
 
-        /* Zona del Tigre con Aura */
-        .tiger-zone {
+        .tiger-container {
             position: relative; flex-grow: 1; display: flex; align-items: center; justify-content: center;
         }
-        .aura-glow {
-            width: 320px; height: 320px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(157, 80, 187, 0.3) 0%, transparent 70%);
-            position: absolute; animation: pulse 2.5s infinite;
-        }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.15); opacity: 0.7; } }
-
-        .tiger-clicker {
+        .tiger-circle {
             width: 270px; height: 270px; border-radius: 50%;
-            border: 6px solid var(--neon-blue); position: relative; z-index: 5;
-            box-shadow: 0 0 40px var(--neon-blue), inset 0 0 20px var(--neon-blue);
-            cursor: pointer; transition: transform 0.1s; background: #000; overflow: hidden;
+            border: 6px solid var(--cyan); box-shadow: 0 0 40px var(--cyan), inset 0 0 20px var(--cyan);
+            cursor: pointer; transition: transform 0.1s;
+            background: #000; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; z-index: 5;
         }
-        .tiger-clicker:active { transform: scale(0.94); }
-        .tiger-clicker img { width: 100%; height: 100%; object-fit: cover; }
+        .tiger-circle:active { transform: scale(0.92); }
+        .tiger-circle img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Barra de Energía y Footer */
-        .footer-ui { width: 100%; padding-bottom: 30px; }
-        .energy-box { width: 85%; margin: 0 auto 20px auto; }
-        .energy-text { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; font-weight: bold; }
-        .energy-bar-bg { height: 15px; background: #1a1a1a; border-radius: 20px; border: 1px solid #333; overflow: hidden; }
-        .energy-bar-fill { 
-            height: 100%; width: 100%; 
-            background: linear-gradient(90deg, var(--neon-purple), var(--neon-blue));
-            box-shadow: 0 0 15px var(--neon-blue); transition: width 0.2s;
+        .aura {
+            width: 330px; height: 330px; position: absolute; border-radius: 50%;
+            background: radial-gradient(circle, rgba(188, 19, 254, 0.25) 0%, transparent 70%);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 0.5; } }
+
+        .footer { width: 90%; padding-bottom: 40px; }
+        .energy-bar {
+            height: 14px; background: #1a1a1a; border-radius: 10px;
+            border: 1px solid #333; overflow: hidden; margin-top: 8px;
+        }
+        .energy-fill {
+            height: 100%; width: 100%; background: linear-gradient(90deg, var(--magenta), var(--cyan));
+            box-shadow: 0 0 10px var(--cyan); transition: width 0.2s;
         }
 
-        /* Números Flotantes */
         .floating-tap {
             position: absolute; color: white; font-family: 'Orbitron'; font-weight: 900;
-            font-size: 35px; pointer-events: none; animation: flyUp 0.8s ease-out forwards;
-            text-shadow: 0 0 10px var(--neon-blue); z-index: 100;
+            font-size: 32px; pointer-events: none; animation: fly 0.8s ease-out forwards;
+            z-index: 100; text-shadow: 0 0 10px var(--cyan);
         }
-        @keyframes flyUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-150px); opacity: 0; } }
+        @keyframes fly { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-140px); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div class="header-stats">
-        <div class="stat-card"><small>P/CLIC</small><b>+15</b></div>
-        <div class="stat-card"><small>P/HORA</small><b style="color:var(--gold)">+8.5K</b></div>
+    <div class="header">
+        <div class="card"><small>Ataque</small><b>+25</b></div>
+        <div class="card"><small>Profit/H</small><b style="color:var(--gold)">+12.8K</b></div>
     </div>
 
-    <div class="main-balance" id="coinCount">0</div>
+    <div class="balance" id="coins">0</div>
 
-    <div class="tiger-zone">
-        <div class="aura-glow"></div>
-        <div class="tiger-clicker" id="tapBtn">
-            <img id="tigerImg" 
-                 src="https://www.shutterstock.com/shutterstock/photos/2443657351/display_1500/stock-photo-angry-tiger-head-mascot-logo-cyberpunk-style-digital-illustration-2443657351.jpg" 
-                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/1998/1998810.png'"
-                 alt="Alpha Tiger">
+    <div class="tiger-container">
+        <div class="aura"></div>
+        <div class="tiger-circle" id="tapBtn">
+            <img src="https://i.ibb.co/pP3V2mP/cyber-tiger.png" 
+                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/1998/1998810.png'" 
+                 alt="Tiger">
         </div>
     </div>
 
-    <div class="footer-ui">
-        <div class="energy-box">
-            <div class="energy-text">
-                <span>⚡ POTENCIA DE COMBATE</span>
-                <span id="energyNum">2000 / 2000</span>
-            </div>
-            <div class="energy-bar-bg"><div class="energy-bar-fill" id="energyFill"></div></div>
+    <div class="footer">
+        <div style="display:flex; justify-content:space-between; font-size:13px; font-weight: bold;">
+            <span>⚡ ENERGÍA ALPHA</span>
+            <span id="energyText">1500 / 1500</span>
         </div>
+        <div class="energy-bar"><div class="energy-fill" id="energyBar"></div></div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.enableClosingConfirmation();
 
-        let stats = {
-            coins: parseInt(localStorage.getItem('tiger_coins')) || 0,
-            energy: 2000,
-            maxEnergy: 2000
+        let data = {
+            coins: parseInt(localStorage.getItem('tiger_v4_coins')) || 0,
+            energy: 1500,
+            maxEnergy: 1500
         };
 
-        function updateDisplay() {
-            document.getElementById('coinCount').innerText = Math.floor(stats.coins).toLocaleString();
-            document.getElementById('energyFill').style.width = (stats.energy / stats.maxEnergy * 100) + '%';
-            document.getElementById('energyNum').innerText = `${Math.floor(stats.energy)} / ${stats.maxEnergy}`;
-            localStorage.setItem('tiger_coins', stats.coins);
+        function sync() {
+            document.getElementById('coins').innerText = Math.floor(data.coins).toLocaleString();
+            document.getElementById('energyBar').style.width = (data.energy / data.maxEnergy * 100) + '%';
+            document.getElementById('energyText').innerText = `${data.energy} / ${data.maxEnergy}`;
+            localStorage.setItem('tiger_v4_coins', data.coins);
         }
 
         document.getElementById('tapBtn').addEventListener('click', (e) => {
-            if (stats.energy >= 5) {
-                stats.coins += 15;
-                stats.energy -= 5;
-                
-                // Efecto Haptico Premium
+            if (data.energy >= 5) {
+                data.coins += 25;
+                data.energy -= 5;
                 tg.HapticFeedback.impactOccurred('heavy');
 
-                // Crear número flotante
-                const tap = document.createElement('div');
-                tap.innerText = '+15';
-                tap.className = 'floating-tap';
-                tap.style.left = e.clientX + 'px';
-                tap.style.top = e.clientY + 'px';
-                document.body.appendChild(tap);
-                setTimeout(() => tap.remove(), 800);
-                
-                updateDisplay();
-            } else {
-                tg.HapticFeedback.notificationOccurred('error');
+                const t = document.createElement('div');
+                t.innerText = '+25';
+                t.className = 'floating-tap';
+                t.style.left = e.clientX + 'px';
+                t.style.top = e.clientY + 'px';
+                document.body.appendChild(t);
+                setTimeout(() => t.remove(), 800);
+                sync();
             }
         });
 
-        // Ganancia Pasiva y Recarga (Igual que en Hamster Kombat)
         setInterval(() => {
-            if(stats.energy < stats.maxEnergy) stats.energy += 3;
-            stats.coins += (8500 / 3600); // Sumar ganancia por hora
-            updateDisplay();
+            if(data.energy < data.maxEnergy) data.energy += 3;
+            data.coins += (12800 / 3600);
+            sync();
         }, 1000);
 
-        updateDisplay();
+        sync();
     </script>
 </body>
 </html>
