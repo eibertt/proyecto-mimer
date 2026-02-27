@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Tiger Empire - Alpha Clicker</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #f1c40f;
+            --orange-neon: #ff6600;
+            --bg-dark: #0a0a0f;
+            --card-bg: #161625;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg-dark);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Stats Bar */
+        .stats-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(22, 22, 37, 0.8);
+            border-bottom: 1px solid #333;
+        }
+
+        .stat-box {
+            background: #1e1e2e;
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid #444;
+            font-size: 11px;
+        }
+
+        .stat-val { color: var(--gold); font-weight: bold; font-family: 'Orbitron'; }
+
+        /* Main Score */
+        .balance-container {
+            padding: 20px 0;
+            font-size: 40px;
+            font-family: 'Orbitron';
+            color: var(--gold);
+            text-shadow: 0 0 20px rgba(241, 196, 15, 0.3);
+        }
+
+        /* Tiger Action Area */
+        .game-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tiger-btn {
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #333 0%, #000 100%);
+            border: 8px solid #222;
+            box-shadow: 0 0 40px rgba(255, 102, 0, 0.2);
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.05s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .tiger-btn:active { transform: scale(0.95); }
+        .tiger-btn img { width: 90%; height: 90%; object-fit: contain; }
+
+        /* Energy Bar */
+        .energy-section { width: 80%; margin: 20px auto; }
+        .energy-info { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
+        .energy-bg { background: #222; height: 12px; border-radius: 6px; overflow: hidden; border: 1px solid #444; }
+        .energy-fill { 
+            background: linear-gradient(90deg, var(--orange-neon), var(--gold)); 
+            height: 100%; width: 100%; transition: width 0.3s;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            background: #161625;
+            padding: 10px 0;
+            border-top: 1px solid #333;
+        }
+
+        .nav-item { font-size: 10px; color: #888; text-decoration: none; cursor: pointer; }
+        .nav-item.active { color: var(--orange-neon); font-weight: bold; }
+
+        /* Floating Animation */
+        .tap-number {
+            position: absolute;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            pointer-events: none;
+            animation: float 0.7s ease-out forwards;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="stats-header">
+        <div class="stat-box">
+            Profit per hour<br>
+            <span class="stat-val" id="pphDisplay">+0</span>
+        </div>
+        <div class="stat-box">
+            Tiger Rank<br>
+            <span class="stat-val" id="rankDisplay">Cachorro</span>
+        </div>
+    </div>
+
+    <div class="balance-container" id="balance">0</div>
+
+    <div class="game-area">
+        <div class="tiger-btn" id="tigerBtn">
+            <img id="tigerImg" src="https://cdn-icons-png.flaticon.com/512/1998/1998810.png" alt="Tiger">
+        </div>
+    </div>
+
+    <div class="energy-section">
+        <div class="energy-info">
+            <span>⚡ Energía</span>
+            <span id="energyText">1000/1000</span>
+        </div>
+        <div class="energy-bg">
+            <div class="energy-fill" id="energyBar"></div>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="nav-item active">TAPPING</div>
+        <div class="nav-item" onclick="window.Telegram.WebApp.showAlert('Sección Mine en desarrollo')">MINE</div>
+        <div class="nav-item" onclick="window.Telegram.WebApp.showAlert('Invita amigos para ganar +5000')">FRIENDS</div>
+        <div class="nav-item" onclick="window.Telegram.WebApp.showAlert('Bono diario disponible mañana')">AIRDROP</div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Inicializar datos desde localStorage
+        let data = {
+            balance: parseInt(localStorage.getItem('tiger_balance')) || 0,
+            energy: parseInt(localStorage.getItem('tiger_energy')) || 1000,
+            pph: parseInt(localStorage.getItem('tiger_pph')) || 0,
+            level: localStorage.getItem('tiger_level') || 'Cachorro'
+        };
+
+        const elements = {
+            balance: document.getElementById('balance'),
+            energyBar: document.getElementById('energyBar'),
+            energyText: document.getElementById('energyText'),
+            rank: document.getElementById('rankDisplay'),
+            pph: document.getElementById('pphDisplay'),
+            tigerImg: document.getElementById('tigerImg')
+        };
+
+        function updateUI() {
+            elements.balance.innerText = Math.floor(data.balance).toLocaleString();
+            elements.energyBar.style.width = (data.energy / 10) + '%';
+            elements.energyText.innerText = `${data.energy}/1000`;
+            elements.rank.innerText = data.level;
+            elements.pph.innerText = `+${data.pph.toLocaleString()}`;
+            
+            // Lógica de evolución visual
+            if(data.balance > 100000) {
+                data.level = "Guerrero";
+                elements.tigerImg.src = "https://cdn-icons-png.flaticon.com/512/1998/1998808.png";
+            }
+            
+            localStorage.setItem('tiger_balance', data.balance);
+            localStorage.setItem('tiger_energy', data.energy);
+        }
+
+        document.getElementById('tigerBtn').addEventListener('click', (e) => {
+            if (data.energy >= 1) {
+                data.balance += 1;
+                data.energy -= 1;
+                
+                // Efecto visual de número flotante
+                const num = document.createElement('div');
+                num.innerText = '+1';
+                num.className = 'tap-number';
+                num.style.left = e.clientX + 'px';
+                num.style.top = e.clientY + 'px';
+                document.body.appendChild(num);
+                setTimeout(() => num.remove(), 700);
+
+                // Feedback táctil
+                tg.HapticFeedback.impactOccurred('light');
+                updateUI();
+            }
+        });
+
+        // Minería pasiva y Recarga de energía
+        setInterval(() => {
+            // Recarga energía (+1 por segundo)
+            if (data.energy < 1000) data.energy += 1;
+            
+            // Sumar ganancia pasiva por hora (convertida a segundos)
+            if (data.pph > 0) data.balance += (data.pph / 3600);
+            
+            updateUI();
+        }, 1000);
+
+        updateUI();
+    </script>
+</body>
+</html>
