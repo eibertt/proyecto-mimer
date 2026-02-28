@@ -6,118 +6,182 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Limpieza de interfaces externas */
         iframe, ins, .adsbygoogle, #pago-movil-popup { display: none !important; }
-        body { background-color: #f1f5f9; font-family: 'Segoe UI', Roboto, sans-serif; overflow: hidden; }
         
-        .tab-content { display: none; height: calc(100vh - 85px); overflow-y: auto; padding: 20px; }
-        .active-tab { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Tarjeta de Perfil Estilo Black Card */
-        .profile-card {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border-radius: 28px; padding: 25px; color: white; position: relative;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
+        body { background-color: #f8fafc; font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; }
+        
+        /* PANTALLA DE CARGA (IGUAL AL VIDEO) */
+        #splash {
+            position: fixed; inset: 0; background: #1e293b; 
+            z-index: 9999; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center;
         }
 
-        /* Botón Bóveda Play Store */
-        .vault-sphere {
+        /* DISEÑO DE PESTAÑAS */
+        .tab-content { display: none; height: calc(100vh - 85px); overflow-y: auto; padding: 20px; width: 100%; }
+        .active-tab { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* BÓVEDA PRO - ESTILO VIDEO */
+        .vault-container {
             width: 200px; height: 200px;
-            background: #2563eb; border-radius: 50px;
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            border-radius: 40px;
+            box-shadow: 0 15px 35px rgba(30, 58, 138, 0.25);
             display: flex; align-items: center; justify-content: center;
-            font-size: 70px; box-shadow: 0 20px 40px rgba(37, 99, 235, 0.3);
-            cursor: pointer; transition: 0.2s; border: 5px solid white;
+            font-size: 75px; cursor: pointer; transition: 0.2s;
+            border: 5px solid white;
         }
-        .vault-sphere:active { transform: scale(0.9); background: #1d4ed8; }
+        .vault-container:active { transform: scale(0.92); }
 
-        /* Nav Bar Android 14 */
+        /* TARJETAS DE PERFIL Y RETIRO */
+        .glass-card { background: white; border-radius: 24px; padding: 22px; border: 1px solid #e2e8f0; }
+        
+        /* BARRA DE NAVEGACIÓN (ESTILO ANDROID) */
         .bottom-nav {
             position: fixed; bottom: 0; width: 100%; height: 85px;
-            background: white; border-top: 1px solid #e2e8f0;
-            display: flex; justify-content: space-around; padding-top: 10px;
+            background: white; border-top: 1px solid #e2e8f0; 
+            display: flex; justify-content: space-around; padding-top: 12px;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #94a3b8; font-size: 10px; font-weight: 800; cursor: pointer; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #94a3b8; font-size: 10px; font-weight: 800; gap: 4px; }
         .nav-item.active { color: #2563eb; }
+
+        /* BARRA DE PROGRESO DE RETIRO */
+        .p-bg { background: #e2e8f0; border-radius: 10px; height: 10px; width: 100%; overflow: hidden; }
+        .p-fill { background: linear-gradient(90deg, #3b82f6, #10b981); height: 100%; transition: width 0.8s ease; }
     </style>
 </head>
 <body>
 
+    <div id="splash">
+        <div class="text-7xl mb-4">💎</div>
+        <h1 class="text-white text-3xl font-black italic tracking-tighter">TITAN CASH</h1>
+        <p class="text-blue-400 text-[10px] font-bold uppercase tracking-widest mt-2">Seguridad Encriptada</p>
+        <div class="mt-8 w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+
     <div class="flex flex-col h-screen">
         
         <div id="tab-home" class="tab-content active-tab">
-            <div class="flex justify-between items-center mb-10">
-                <h1 class="text-2xl font-black text-slate-800">Titan <span class="text-blue-600">Cash</span></h1>
-                <div class="bg-blue-600 text-white px-4 py-1 rounded-full font-bold shadow-lg">$ <span class="balance-val">0.00</span></div>
+            <header class="flex justify-between items-center mb-10">
+                <h2 class="text-xl font-black text-slate-800 italic">Bóveda <span class="text-blue-600">Pro</span></h2>
+                <div class="bg-blue-600 text-white px-5 py-2 rounded-full font-bold shadow-lg">$ <span class="bal-txt">0.00</span></div>
+            </header>
+
+            <div class="flex flex-col items-center py-4">
+                <div class="vault-container" onclick="openVault()">🔒</div>
+                <div class="mt-8 text-center">
+                    <p class="font-black text-slate-400 text-[10px] tracking-widest uppercase">Toca para desbloquear</p>
+                    <p class="text-blue-600 font-bold text-xs mt-1">Ganas $0.15 por cada apertura</p>
+                </div>
             </div>
-            
-            <div class="flex flex-col items-center py-6">
-                <div onclick="openVault()" class="vault-sphere">🔒</div>
-                <p class="mt-8 font-black text-slate-400 text-[10px] tracking-widest uppercase">Toca la bóveda para ganar</p>
-                <p class="text-blue-500 font-bold text-xs mt-2">Recompensa: $0.15</p>
+
+            <div class="glass-card mt-10 flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">Energía</p>
+                    <p class="text-sm font-black text-slate-800">Carga al 100%</p>
+                </div>
+                <button onclick="tg.openLink('https://omg10.com/4/10663699')" class="bg-blue-100 text-blue-600 px-4 py-2 rounded-xl text-xs font-black italic">VER AD</button>
             </div>
         </div>
 
-        <div id="tab-profile" class="tab-content">
-            <h2 class="text-2xl font-black text-slate-900 mb-6">Mi Perfil</h2>
-            <div class="profile-card mb-8">
-                <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 bg-blue-500 rounded-full flex items-center justify-center text-2xl border-2 border-white/20">👤</div>
-                    <div>
-                        <h3 id="user-display" class="font-black text-lg">Cargando...</h3>
-                        <p class="text-[10px] text-blue-300 font-bold uppercase">Miembro Verificado</p>
-                    </div>
+        <div id="tab-withdraw" class="tab-content">
+            <h2 class="text-2xl font-black mb-6 italic">Retirar <span class="text-green-600">Dinero</span></h2>
+            
+            <div class="glass-card mb-6">
+                <div class="flex justify-between items-end mb-3">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Tu progreso actual</p>
+                    <p class="text-xl font-black text-blue-600">$ <span class="bal-txt">0.00</span> / $10.00</p>
                 </div>
-                <div class="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-white/10">
-                    <div>
-                        <p class="text-[9px] text-slate-400 uppercase font-bold">Balance Actual</p>
-                        <p class="text-xl font-black">$ <span class="balance-val">0.00</span></p>
-                    </div>
-                    <div>
-                        <p class="text-[9px] text-slate-400 uppercase font-bold">Publicidad</p>
-                        <p class="text-xl font-black" id="ad-count">0</p>
-                    </div>
+                <div class="p-bg mb-2">
+                    <div id="bar-fill" class="p-fill" style="width: 0%"></div>
+                </div>
+                <p class="text-[9px] text-slate-400 font-bold">Mínimo para transferencia bancaria: $10.00 USD</p>
+            </div>
+
+            <h3 class="text-xs font-black text-slate-600 mb-4 uppercase">Métodos aceptados</h3>
+            <div class="grid grid-cols-3 gap-3 mb-8">
+                <div class="bg-white border-2 border-slate-100 p-4 rounded-2xl text-center">
+                    <span class="text-2xl">💳</span><p class="text-[8px] font-black mt-1">PAGO MÓVIL</p>
+                </div>
+                <div class="bg-white border-2 border-slate-100 p-4 rounded-2xl text-center">
+                    <span class="text-2xl">🅿️</span><p class="text-[8px] font-black mt-1">PAYPAL</p>
+                </div>
+                <div class="bg-white border-2 border-slate-100 p-4 rounded-2xl text-center">
+                    <span class="text-2xl">🪙</span><p class="text-[8px] font-black mt-1">BINANCE</p>
+                </div>
+            </div>
+
+            <button id="btn-withdraw" class="w-full bg-slate-200 text-slate-400 py-4 rounded-2xl font-black text-xs" disabled>SOLICITAR PAGO</button>
+        </div>
+
+        <div id="tab-profile" class="tab-content">
+            <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-[35px] p-8 text-white text-center mb-8 shadow-xl">
+                <div class="w-20 h-20 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl border-2 border-white/40">👤</div>
+                <h3 id="u-display" class="text-xl font-black uppercase tracking-tight">TITAN USER</h3>
+                <p class="text-[10px] opacity-70 font-bold tracking-widest">TITAN ID #8822</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="glass-card text-center">
+                    <p class="text-[9px] text-slate-400 font-black uppercase mb-1">Balance</p>
+                    <p class="text-lg font-black text-blue-600 tracking-tighter">$ <span class="bal-txt">0.00</span></p>
+                </div>
+                <div class="glass-card text-center">
+                    <p class="text-[9px] text-slate-400 font-black uppercase mb-1">Anuncios</p>
+                    <p class="text-lg font-black text-slate-800" id="ad-count">0</p>
                 </div>
             </div>
 
             <div class="space-y-3">
-                <div onclick="tg.openLink('https://t.me/eiber0822')" class="bg-white p-4 rounded-2xl flex justify-between items-center border border-slate-100 shadow-sm">
-                    <span class="font-bold text-sm text-slate-700">📢 Canal de Soporte</span>
-                    <span class="text-blue-500 font-bold">❯</span>
+                <div onclick="tg.openLink('https://t.me/eiber0822')" class="glass-card flex justify-between items-center py-4">
+                    <span class="font-bold text-sm">📢 Canal Oficial</span><span class="text-blue-500">❯</span>
                 </div>
-                <div onclick="tg.openLink('https://portaltecnohoy.blogspot.com')" class="bg-white p-4 rounded-2xl flex justify-between items-center border border-slate-100 shadow-sm">
-                    <span class="font-bold text-sm text-slate-700">🌐 Portal Web</span>
-                    <span class="text-blue-500 font-bold">❯</span>
+                <div onclick="tg.openLink('https://portaltecnohoy.blogspot.com')" class="glass-card flex justify-between items-center py-4">
+                    <span class="font-bold text-sm">🌐 Portal Web</span><span class="text-blue-500">❯</span>
                 </div>
             </div>
         </div>
 
         <nav class="bottom-nav">
-            <div class="nav-item active" onclick="changeTab('tab-home', this)">
+            <div class="nav-item active" onclick="switchTab('tab-home', this)">
                 <span class="text-2xl">⚡</span><span>HACK</span>
             </div>
-            <div class="nav-item" onclick="changeTab('tab-profile', this)">
-                <span class="text-2xl">👤</span><span>PERFIL</span>
+            <div class="nav-item" onclick="switchTab('tab-withdraw', this)">
+                <span class="text-2xl">💰</span><span>RETIRO</span>
             </div>
-            <div class="nav-item" onclick="alert('Retiro mínimo: $10.00')">
-                <span class="text-2xl">💰</span><span>COBRAR</span>
+            <div class="nav-item" onclick="switchTab('tab-profile', this)">
+                <span class="text-2xl">👤</span><span>PERFIL</span>
             </div>
         </nav>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand();
+        tg.expand(); tg.ready();
 
         let balance = parseFloat(localStorage.getItem('titan_balance')) || 0.00;
         let ads = parseInt(localStorage.getItem('titan_ads')) || 0;
+        const goal = 10.00;
 
-        function updateAllUI() {
-            document.querySelectorAll('.balance-val').forEach(el => el.innerText = balance.toFixed(2));
+        function refreshUI() {
+            document.querySelectorAll('.bal-txt').forEach(el => el.innerText = balance.toFixed(2));
             document.getElementById('ad-count').innerText = ads;
+            
+            let percent = (balance / goal) * 100;
+            if (percent > 100) percent = 100;
+            document.getElementById('bar-fill').style.width = percent + '%';
+
+            const btn = document.getElementById('btn-withdraw');
+            if (balance >= goal) {
+                btn.disabled = false;
+                btn.className = "w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-xs shadow-lg";
+                btn.innerText = "SOLICITAR PAGO AHORA";
+            }
+
             if (tg.initDataUnsafe.user) {
-                document.getElementById('user-display').innerText = tg.initDataUnsafe.user.first_name;
-            } else {
-                document.getElementById('user-display').innerText = "TITAN USER";
+                document.getElementById('u-display').innerText = tg.initDataUnsafe.user.first_name.toUpperCase();
             }
         }
 
@@ -128,19 +192,24 @@
                 ads += 1;
                 localStorage.setItem('titan_balance', balance);
                 localStorage.setItem('titan_ads', ads);
-                updateAllUI();
-                alert("¡Felicidades! +$0.15 añadidos.");
+                refreshUI();
             }, 3000);
         }
 
-        function changeTab(id, el) {
+        function switchTab(id, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active-tab'));
             document.getElementById(id).classList.add('active-tab');
             el.classList.add('active-tab');
         }
 
-        updateAllUI();
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('splash').style.opacity = '0';
+                setTimeout(() => document.getElementById('splash').style.display = 'none', 500);
+            }, 2500);
+            refreshUI();
+        };
     </script>
 </body>
 </html>
