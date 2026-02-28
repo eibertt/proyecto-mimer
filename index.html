@@ -10,10 +10,24 @@
         :root { --bg: #f0f4f8; --dark: #d1d9e6; --light: #ffffff; --primary: #2563eb; }
         body { background-color: var(--bg); font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; }
         
+        /* ESTILO NEUMÓRFICO */
         .neu-card {
             background: var(--bg); border-radius: 24px;
             box-shadow: 7px 7px 15px var(--dark), -7px -7px 15px var(--light);
             border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        /* SPLASH SCREEN (DIAMANTE) */
+        #splash {
+            position: fixed; inset: 0; background: #0f172a; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.6s ease;
+        }
+
+        /* REGISTRO DE NOMBRE */
+        #name-modal {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9);
+            z-index: 9000; display: none; align-items: center; justify-content: center; padding: 20px;
         }
 
         .vault-sphere {
@@ -25,31 +39,43 @@
         }
         .vault-sphere:active { transform: scale(0.95); box-shadow: inset 8px 8px 15px #1a368d; }
 
-        .btn-action {
-            background: var(--primary); color: white; padding: 12px 20px;
-            border-radius: 16px; font-weight: 800; font-style: italic; border: none;
-        }
-
-        /* Barra de Progreso Neumórfica */
         .progress-container { background: #e0e5ec; border-radius: 10px; height: 12px; box-shadow: inset 4px 4px 8px #bec8d2, inset -4px -4px 8px #ffffff; overflow: hidden; }
         .progress-fill { background: linear-gradient(90deg, #3b82f6, #10b981); height: 100%; width: 0%; transition: width 0.5s ease; }
 
         .tab-content { display: none; height: calc(100vh - 100px); overflow-y: auto; padding: 20px; box-sizing: border-box; }
-        .active-tab { display: block; }
+        .active-tab { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        .nav-item { cursor: pointer; transition: 0.3s; }
-        .nav-item.active { color: #2563eb; transform: translateY(-5px); }
+        .nav-item { cursor: pointer; transition: 0.3s; color: #94a3b8; }
+        .nav-item.active { color: #2563eb; transform: translateY(-3px); }
     </style>
 </head>
 <body>
+
+    <div id="splash">
+        <div class="text-7xl mb-4 animate-bounce">💎</div>
+        <h1 class="text-white text-3xl font-extrabold italic tracking-tighter">TITAN <span class="text-blue-500">CASH</span></h1>
+        <div class="mt-8 w-16 h-1 bg-gray-800 rounded-full overflow-hidden">
+            <div class="bg-blue-500 h-full w-full animate-[load_2s_infinite]"></div>
+        </div>
+        <style>@keyframes load { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }</style>
+    </div>
+
+    <div id="name-modal">
+        <div class="neu-card p-8 w-full max-w-sm text-center bg-[#f0f4f8]">
+            <h2 class="text-xl font-black mb-4 text-slate-800">¿CÓMO TE LLAMAS?</h2>
+            <input type="text" id="user-input" placeholder="Escribe tu nombre..." class="w-full p-4 rounded-xl border-2 border-blue-200 mb-6 text-center font-bold outline-none focus:border-blue-500">
+            <button onclick="saveName()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black shadow-lg active:scale-95 transition">COMENZAR</button>
+        </div>
+    </div>
 
     <div class="h-screen flex flex-col">
         
         <div id="home" class="tab-content active-tab space-y-6">
             <header class="flex justify-between items-center">
                 <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Balance</p>
-                    <h2 id="u-display" class="text-lg font-extrabold text-slate-800">TITAN USER</h2>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Bienvenido,</p>
+                    <h2 id="u-display" class="text-lg font-extrabold text-slate-800 uppercase">TITAN USER</h2>
                 </div>
                 <div class="neu-card px-4 py-2 text-blue-600 font-extrabold">$ <span class="bal-txt">0.00</span></div>
             </header>
@@ -62,60 +88,54 @@
             <div class="neu-card p-5 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <span class="text-2xl">⚡</span>
-                    <div>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase">Anuncio</p>
-                        <p class="text-xs font-extrabold">Direct Link Activo</p>
-                    </div>
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase">Anuncio</p><p class="text-xs font-extrabold">Direct Link Activo</p></div>
                 </div>
-                <button onclick="window.open('https://omg10.com')" class="btn-action text-[10px]">VER AD</button>
+                <button onclick="window.open('https://omg10.com')" class="bg-blue-600 text-white px-5 py-2 rounded-xl text-[10px] font-black italic">VER AD</button>
             </div>
         </div>
 
         <div id="withdraw" class="tab-content space-y-6">
             <h2 class="text-2xl font-black italic text-slate-800">Retirar <span class="text-blue-600">Dinero</span></h2>
-            
             <div class="neu-card p-6">
                 <div class="flex justify-between items-center mb-4">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">Progreso de Pago</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">Tu Progreso</p>
                     <p class="font-black text-blue-600">$ <span class="bal-txt">0.00</span> / $10.00</p>
                 </div>
-                <div class="progress-container">
-                    <div id="bar-fill" class="progress-fill"></div>
-                </div>
-                <p class="text-[9px] text-slate-400 mt-3 font-medium">Mínimo requerido: $10.00 USD</p>
+                <div class="progress-container"><div id="bar-fill" class="progress-fill"></div></div>
+                <p class="text-[9px] text-slate-400 mt-3 font-medium text-center">Mínimo para transferencia: $10.00 USD</p>
             </div>
-
             <div class="grid grid-cols-3 gap-3">
-                <div class="neu-card p-4 text-center cursor-pointer active:shadow-inner"><span class="text-xl">💳</span><p class="text-[8px] font-bold mt-1 uppercase">Pago Móvil</p></div>
-                <div class="neu-card p-4 text-center cursor-pointer active:shadow-inner"><span class="text-xl">🅿️</span><p class="text-[8px] font-bold mt-1 uppercase">PayPal</p></div>
-                <div class="neu-card p-4 text-center cursor-pointer active:shadow-inner"><span class="text-xl">🪙</span><p class="text-[8px] font-bold mt-1 uppercase">Binance</p></div>
+                <div class="neu-card p-4 text-center cursor-pointer"><span class="text-xl">💳</span><p class="text-[8px] font-bold mt-1 uppercase">Pago Móvil</p></div>
+                <div class="neu-card p-4 text-center cursor-pointer"><span class="text-xl">🅿️</span><p class="text-[8px] font-bold mt-1 uppercase">PayPal</p></div>
+                <div class="neu-card p-4 text-center cursor-pointer"><span class="text-xl">🪙</span><p class="text-[8px] font-bold mt-1 uppercase">Binance</p></div>
             </div>
-
-            <button id="btn-request" class="w-full bg-slate-300 text-slate-500 py-4 rounded-2xl font-black text-xs uppercase shadow-md" disabled>Solicitar Pago</button>
+            <button id="btn-request" class="w-full bg-slate-300 text-slate-500 py-4 rounded-2xl font-black text-xs uppercase" disabled>Solicitar Pago</button>
         </div>
 
         <div id="profile" class="tab-content space-y-6">
             <div class="neu-card p-8 text-center">
-                <div class="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl">👤</div>
-                <h3 class="font-extrabold text-slate-800 uppercase text-sm">TITAN ID #8822</h3>
+                <div class="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl shadow-inner">👤</div>
+                <h3 id="u-display-profile" class="font-extrabold text-slate-800 uppercase text-sm">TITAN USER</h3>
+                <p class="text-[9px] text-blue-500 font-bold">ID VERIFICADO</p>
             </div>
-            
             <div onclick="window.open('https://portaltecnohoy.blogspot.com')" class="neu-card p-5 flex justify-between items-center cursor-pointer">
                 <span class="font-bold text-xs text-slate-700">🌐 Visitar Portal Web</span>
                 <span class="text-blue-500 font-black">❯</span>
             </div>
+            <button onclick="resetName()" class="text-[10px] text-red-400 font-bold w-full text-center mt-4">CAMBIAR MI NOMBRE</button>
         </div>
 
-        <nav class="fixed bottom-6 left-6 right-6 h-20 bg-white/80 backdrop-blur-md rounded-[30px] shadow-2xl flex justify-around items-center border border-white/50 z-50">
-            <div onclick="switchTab('home', this)" class="nav-item active flex flex-col items-center"><span class="text-xl">🏠</span><span class="text-[9px] font-bold">INICIO</span></div>
-            <div onclick="switchTab('withdraw', this)" class="nav-item flex flex-col items-center"><span class="text-xl">💸</span><span class="text-[9px] font-bold">RETIRO</span></div>
-            <div onclick="switchTab('profile', this)" class="nav-item flex flex-col items-center"><span class="text-xl">👤</span><span class="text-[9px] font-bold">PERFIL</span></div>
+        <nav class="fixed bottom-6 left-6 right-6 h-20 bg-white/80 backdrop-blur-md rounded-[30px] shadow-2xl flex justify-around items-center border border-white/50">
+            <div onclick="switchTab('home', this)" class="nav-item active flex flex-col items-center"><span class="text-xl">🏠</span><span class="text-[9px] font-bold mt-1">INICIO</span></div>
+            <div onclick="switchTab('withdraw', this)" class="nav-item flex flex-col items-center"><span class="text-xl">💸</span><span class="text-[9px] font-bold mt-1">RETIRO</span></div>
+            <div onclick="switchTab('profile', this)" class="nav-item flex flex-col items-center"><span class="text-xl">👤</span><span class="text-[9px] font-bold mt-1">PERFIL</span></div>
         </nav>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         let balance = parseFloat(localStorage.getItem('titan_bal_v2')) || 0;
+        let userName = localStorage.getItem('titan_user_name');
 
         function switchTab(id, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
@@ -128,26 +148,54 @@
             balance += 0.15;
             localStorage.setItem('titan_bal_v2', balance);
             updateUI();
-            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy');
+            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         }
 
         function updateUI() {
             document.querySelectorAll('.bal-txt').forEach(e => e.innerText = balance.toFixed(2));
-            
             let progress = (balance / 10) * 100;
             document.getElementById('bar-fill').style.width = Math.min(progress, 100) + '%';
-            
             let btn = document.getElementById('btn-request');
             if(balance >= 10) {
                 btn.disabled = false;
-                btn.classList.replace('bg-slate-300', 'bg-blue-600');
-                btn.classList.replace('text-slate-500', 'text-white');
+                btn.classList.add('bg-blue-600', 'text-white');
             }
         }
-        
+
+        function saveName() {
+            let input = document.getElementById('user-input').value;
+            if(input.length > 2) {
+                localStorage.setItem('titan_user_name', input);
+                userName = input;
+                document.getElementById('name-modal').style.display = 'none';
+                applyName();
+            } else { alert("Por favor, pon un nombre real."); }
+        }
+
+        function applyName() {
+            document.getElementById('u-display').innerText = userName;
+            document.getElementById('u-display-profile').innerText = userName;
+        }
+
+        function resetName() {
+            localStorage.removeItem('titan_user_name');
+            location.reload();
+        }
+
         window.onload = () => {
-            document.getElementById('u-display').innerText = tg.initDataUnsafe.user?.first_name || "TITAN USER";
-            updateUI();
+            setTimeout(() => {
+                document.getElementById('splash').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('splash').style.display = 'none';
+                    // Si no hay nombre guardado, pedirlo
+                    if(!userName) {
+                        document.getElementById('name-modal').style.cssText = "display: flex !important;";
+                    } else {
+                        applyName();
+                    }
+                }, 600);
+                updateUI();
+            }, 2500);
         };
     </script>
 </body>
