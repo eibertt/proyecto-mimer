@@ -2,175 +2,77 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FUTURE ARCADE 3D - ULTRA HD</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titan Cash - Dashboard</title>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
-        #ui {
-            position: absolute; top: 20px; width: 100%; text-align: center;
-            color: #00ffff; font-size: 20px; font-weight: bold; pointer-events: none;
-            text-shadow: 0 0 10px #00ffff; z-index: 10;
-        }
-        #overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(0,0,0,0.4) 0%, #000 100%);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 100; color: #fff;
-        }
-        .btn {
-            background: rgba(0, 255, 255, 0.1); border: 2px solid #00ffff;
-            color: #00ffff; padding: 20px 40px; font-size: 20px; border-radius: 5px;
-            cursor: pointer; text-transform: uppercase; box-shadow: 0 0 20px #00ffff;
-        }
+        body { margin: 0; font-family: 'Arial', sans-serif; background: #0a0a0a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .app-container { width: 90%; max-width: 400px; background: #1a1a1a; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .balance-card { background: linear-gradient(135deg, #00b09b, #96c93d); padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 25px; }
+        .balance-title { font-size: 14px; opacity: 0.9; text-transform: uppercase; }
+        .balance-amount { font-size: 36px; font-weight: bold; margin: 10px 0; }
+        .task-list { margin-top: 20px; }
+        .task-item { background: #252525; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+        .task-item:active { transform: scale(0.98); }
+        .btn-withdraw { width: 100%; background: #fff; color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 20px; }
+        .status { font-size: 12px; color: #00ff00; margin-top: 10px; text-align: center; }
     </style>
 </head>
 <body>
 
-<div id="ui">SCORE: <span id="score">0</span></div>
+<div class="app-container">
+    <div class="header">
+        <h2 style="color: #00b09b;">TITAN CASH</h2>
+        <p style="font-size: 12px; color: #888;">ID: 9823-TX-2026</p>
+    </div>
 
-<div id="overlay">
-    <h1 style="letter-spacing: 15px;">ULTRA 3D</h1>
-    <button class="btn" id="startBtn">INICIAR SIMULACIÓN</button>
+    <div class="balance-card">
+        <div class="balance-title">Saldo Disponible</div>
+        <div class="balance-amount">$<span id="balance">12.50</span></div>
+        <div style="font-size: 11px;">Mínimo de retiro: $50.00</div>
+    </div>
+
+    <div class="task-list">
+        <div class="task-item" onclick="completeTask(0.50)">
+            <span>Ver Anuncio Premium</span>
+            <span style="color: #96c93d;">+$0.50</span>
+        </div>
+        <div class="task-item" onclick="completeTask(1.20)">
+            <span>Instalar App Sugerida</span>
+            <span style="color: #96c93d;">+$1.20</span>
+        </div>
+        <div class="task-item" onclick="completeTask(0.10)">
+            <span>Check-in Diario</span>
+            <span style="color: #96c93d;">+$0.10</span>
+        </div>
+    </div>
+
+    <button class="btn-withdraw" onclick="withdraw()">SOLICITAR RETIRO</button>
+    <div id="msg" class="status"></div>
 </div>
 
-<script type="importmap">
-  {
-    "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+<script>
+    let currentBalance = 12.50;
+
+    function completeTask(amount) {
+        currentBalance += amount;
+        document.getElementById('balance').innerText = currentBalance.toFixed(2);
+        showMsg("¡Tarea completada con éxito!");
     }
-  }
-</script>
 
-<script type="module">
-import * as THREE from 'three';
-
-let scene, camera, renderer, player, clock;
-let obstacles = [];
-let isPaused = true;
-let score = 0;
-
-function init() {
-    scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x000000, 0.05); // Niebla para profundidad
-
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 8;
-    camera.position.x = -2;
-
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    document.body.appendChild(renderer.domElement);
-
-    // Iluminación
-    const ambient = new THREE.AmbientLight(0x404040, 2);
-    scene.add(ambient);
-
-    const light = new THREE.PointLight(0x00ffff, 10, 20);
-    scene.add(light);
-    
-    // Jugador: Un cubo de cristal neón
-    const geometry = new THREE.BoxGeometry(0.6, 0.6, 0.6);
-    const material = new THREE.MeshPhongMaterial({ 
-        color: 0x00ffff, 
-        emissive: 0x00ffff, 
-        transparent: true, 
-        opacity: 0.8,
-        shininess: 100 
-    });
-    player = new THREE.Mesh(geometry, material);
-    player.position.set(-4, 0, 0);
-    player.userData = { vy: 0 };
-    scene.add(player);
-
-    clock = new THREE.Clock();
-}
-
-function createObstacle() {
-    const gap = 4;
-    const topHeight = Math.random() * 6 + 1;
-    
-    const obsGeo = new THREE.BoxGeometry(1, topHeight, 1);
-    const obsMat = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.8, roughness: 0.2 });
-    
-    // Poste Superior
-    const topObs = new THREE.Mesh(obsGeo, obsMat);
-    topObs.position.set(15, 6, 0);
-    
-    // Poste Inferior
-    const botObs = new THREE.Mesh(obsGeo, obsMat);
-    botObs.position.set(15, -6, 0);
-
-    const group = new THREE.Group();
-    group.add(topObs, botObs);
-    scene.add(group);
-    obstacles.push({ mesh: group, passed: false });
-}
-
-function animate() {
-    if(isPaused) return;
-    requestAnimationFrame(animate);
-
-    const delta = clock.getDelta();
-    
-    // Gravedad y Salto
-    player.userData.vy -= 15 * delta;
-    player.position.y += player.userData.vy * delta;
-
-    // Rotación del jugador para realismo
-    player.rotation.x += delta * 2;
-    player.rotation.z += delta * 1.5;
-
-    // Movimiento Obstáculos
-    obstacles.forEach((obj, i) => {
-        obj.mesh.position.x -= 8 * delta;
-
-        // Colisión simple
-        if(Math.abs(obj.mesh.position.x + 4) < 0.8) {
-            if(player.position.y > 1.5 || player.position.y < -1.5) die();
+    function withdraw() {
+        if(currentBalance < 50) {
+            alert("Saldo insuficiente. Necesitas al menos $50.00 para retirar via PayPal o Cripto.");
+        } else {
+            showMsg("Procesando solicitud de retiro...");
         }
+    }
 
-        if(!obj.passed && obj.mesh.position.x < -4) {
-            obj.passed = true;
-            score++;
-            document.getElementById('score').innerText = score;
-        }
-
-        if(obj.mesh.position.x < -20) {
-            scene.remove(obj.mesh);
-            obstacles.splice(i, 1);
-        }
-    });
-
-    if(Math.random() < 0.02) createObstacle();
-    if(player.position.y > 6 || player.position.y < -6) die();
-
-    renderer.render(scene, camera);
-}
-
-function die() {
-    isPaused = true;
-    document.getElementById('overlay').style.display = 'flex';
-}
-
-document.getElementById('startBtn').onclick = () => {
-    isPaused = false;
-    score = 0;
-    document.getElementById('score').innerText = score;
-    player.position.y = 0;
-    player.userData.vy = 0;
-    obstacles.forEach(o => scene.remove(o.mesh));
-    obstacles = [];
-    document.getElementById('overlay').style.display = 'none';
-    animate();
-};
-
-window.addEventListener('touchstart', () => {
-    if(!isPaused) player.userData.vy = 6;
-});
-
-init();
-renderer.render(scene, camera);
+    function showMsg(text) {
+        const m = document.getElementById('msg');
+        m.innerText = text;
+        setTimeout(() => m.innerText = "", 3000);
+    }
 </script>
 </body>
 </html>
