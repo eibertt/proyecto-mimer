@@ -6,156 +6,100 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Limpieza de anuncios de plantilla */
         iframe, ins, .adsbygoogle, #pago-movil-popup { display: none !important; }
+        body { background-color: #f1f5f9; font-family: 'Segoe UI', Roboto, sans-serif; overflow: hidden; }
         
-        body { background-color: #f8fafc; font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; color: #1e293b; }
-        
-        /* Pantalla de Carga Estilo Play Store */
-        #splash {
-            position: fixed; inset: 0; background: #1e293b; 
-            z-index: 9999; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center;
-            transition: opacity 0.6s ease-out;
-        }
-
-        /* Contenedores de Pestañas */
-        .tab-content { display: none; height: calc(100vh - 85px); overflow-y: auto; padding: 20px; width: 100%; }
+        .tab-content { display: none; height: calc(100vh - 85px); overflow-y: auto; padding: 20px; }
         .active-tab { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Elementos Visuales Pro */
-        .vault-btn {
-            width: 200px; height: 200px;
-            background: linear-gradient(135deg, #3b82f6, #1e40af);
-            border-radius: 45px;
-            box-shadow: 0 20px 40px rgba(30, 58, 138, 0.3);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 70px; cursor: pointer; transition: 0.2s;
-            border: 6px solid white;
+        /* Tarjeta de Perfil Estilo Black Card */
+        .profile-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 28px; padding: 25px; color: white; position: relative;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
         }
-        .vault-btn:active { transform: scale(0.9) rotate(-5deg); }
 
-        .card-premium { background: white; border-radius: 24px; padding: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        
-        /* Barra de Navegación Android 14 */
+        /* Botón Bóveda Play Store */
+        .vault-sphere {
+            width: 200px; height: 200px;
+            background: #2563eb; border-radius: 50px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 70px; box-shadow: 0 20px 40px rgba(37, 99, 235, 0.3);
+            cursor: pointer; transition: 0.2s; border: 5px solid white;
+        }
+        .vault-sphere:active { transform: scale(0.9); background: #1d4ed8; }
+
+        /* Nav Bar Android 14 */
         .bottom-nav {
             position: fixed; bottom: 0; width: 100%; height: 85px;
-            background: rgba(255, 255, 255, 0.95); backdrop-blur: 10px;
-            border-top: 1px solid #e2e8f0; display: flex; 
-            justify-content: space-around; padding-top: 12px; z-index: 100;
+            background: white; border-top: 1px solid #e2e8f0;
+            display: flex; justify-content: space-around; padding-top: 10px;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #94a3b8; font-size: 10px; font-weight: 800; gap: 4px; cursor: pointer; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #94a3b8; font-size: 10px; font-weight: 800; cursor: pointer; }
         .nav-item.active { color: #2563eb; }
-
-        /* Barra de Progreso */
-        .progress-bg { background: #e2e8f0; border-radius: 10px; height: 10px; width: 100%; overflow: hidden; }
-        .progress-bar { background: linear-gradient(90deg, #3b82f6, #10b981); height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
 <body>
 
-    <div id="splash">
-        <div class="text-7xl mb-4">💎</div>
-        <h1 class="text-white text-3xl font-black italic tracking-tighter">TITAN CASH</h1>
-        <p class="text-blue-400 text-[10px] font-bold uppercase tracking-widest mt-2">Seguridad Encriptada</p>
-        <div class="mt-8 w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-    </div>
-
     <div class="flex flex-col h-screen">
         
         <div id="tab-home" class="tab-content active-tab">
-            <header class="flex justify-between items-center mb-8">
-                <h2 class="text-xl font-black text-slate-800 italic">Bóveda <span class="text-blue-600">Pro</span></h2>
-                <div class="bg-blue-600 text-white px-5 py-2 rounded-full font-bold shadow-lg">$ <span class="balance-txt">0.00</span></div>
-            </header>
-
-            <div class="flex flex-col items-center justify-center py-6">
-                <div class="vault-btn" onclick="mineVault()">🔒</div>
-                <div class="mt-8 text-center">
-                    <p class="font-black text-slate-400 text-[10px] tracking-[0.3em] uppercase">Toca para desbloquear</p>
-                    <p class="text-[11px] text-blue-500 font-bold mt-1">Ganas $0.15 por cada apertura</p>
-                </div>
+            <div class="flex justify-between items-center mb-10">
+                <h1 class="text-2xl font-black text-slate-800">Titan <span class="text-blue-600">Cash</span></h1>
+                <div class="bg-blue-600 text-white px-4 py-1 rounded-full font-bold shadow-lg">$ <span class="balance-val">0.00</span></div>
             </div>
-
-            <div class="card-premium mt-6 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold text-slate-500 uppercase">Energía</p>
-                    <p class="text-sm font-black text-slate-800">Carga al 100%</p>
-                </div>
-                <button onclick="tgOpen('https://omg10.com/4/10663699')" class="bg-blue-100 text-blue-600 px-4 py-2 rounded-xl text-xs font-black italic">VER AD</button>
-            </div>
-        </div>
-
-        <div id="tab-withdraw" class="tab-content">
-            <h2 class="text-2xl font-black mb-6">Retirar <span class="text-green-600">Dinero</span></h2>
             
-            <div class="card-premium mb-6">
-                <div class="flex justify-between items-end mb-3">
-                    <p class="text-[10px] font-black text-slate-400 uppercase">Tu progreso actual</p>
-                    <p class="text-xl font-black text-blue-600">$ <span class="balance-txt">0.00</span> / $10.00</p>
-                </div>
-                <div class="progress-bg mb-2">
-                    <div id="p-bar" class="progress-bar" style="width: 0%"></div>
-                </div>
-                <p class="text-[9px] text-slate-400 font-bold">Llega a los $10.00 para habilitar la transferencia bancaria.</p>
+            <div class="flex flex-col items-center py-6">
+                <div onclick="openVault()" class="vault-sphere">🔒</div>
+                <p class="mt-8 font-black text-slate-400 text-[10px] tracking-widest uppercase">Toca la bóveda para ganar</p>
+                <p class="text-blue-500 font-bold text-xs mt-2">Recompensa: $0.15</p>
             </div>
-
-            <h3 class="text-xs font-black text-slate-600 mb-4 uppercase">Métodos aceptados</h3>
-            <div class="grid grid-cols-3 gap-3 mb-8">
-                <div class="bg-white border-2 border-slate-100 p-3 rounded-2xl flex flex-col items-center gap-2">
-                    <span class="text-xl">💳</span><span class="text-[8px] font-black">PAGO MÓVIL</span>
-                </div>
-                <div class="bg-white border-2 border-slate-100 p-3 rounded-2xl flex flex-col items-center gap-2">
-                    <span class="text-xl">🅿️</span><span class="text-[8px] font-black">PAYPAL</span>
-                </div>
-                <div class="bg-white border-2 border-slate-100 p-3 rounded-2xl flex flex-col items-center gap-2">
-                    <span class="text-xl">🪙</span><span class="text-[8px] font-black">BINANCE</span>
-                </div>
-            </div>
-
-            <button id="btn-pay" class="w-full bg-slate-200 text-slate-400 py-4 rounded-2xl font-black text-xs cursor-not-allowed" disabled>
-                SOLICITAR PAGO
-            </button>
         </div>
 
         <div id="tab-profile" class="tab-content">
-            <div class="bg-gradient-to-br from-blue-600 to-blue-900 rounded-[35px] p-8 text-white text-center mb-6 shadow-xl">
-                <div class="w-20 h-20 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl border-2 border-white/30">👤</div>
-                <h3 id="u-name" class="text-xl font-black">Cargando...</h3>
-                <p class="text-[10px] opacity-70 font-bold uppercase tracking-widest">Titan ID #8822</p>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div class="card-premium text-center">
-                    <p class="text-[9px] text-slate-400 font-black uppercase">Balance</p>
-                    <p class="text-lg font-black text-blue-600">$ <span class="balance-txt">0.00</span></p>
+            <h2 class="text-2xl font-black text-slate-900 mb-6">Mi Perfil</h2>
+            <div class="profile-card mb-8">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 bg-blue-500 rounded-full flex items-center justify-center text-2xl border-2 border-white/20">👤</div>
+                    <div>
+                        <h3 id="user-display" class="font-black text-lg">Cargando...</h3>
+                        <p class="text-[10px] text-blue-300 font-bold uppercase">Miembro Verificado</p>
+                    </div>
                 </div>
-                <div class="card-premium text-center">
-                    <p class="text-[9px] text-slate-400 font-black uppercase">Anuncios</p>
-                    <p class="text-lg font-black text-slate-800" id="ad-total">0</p>
+                <div class="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-white/10">
+                    <div>
+                        <p class="text-[9px] text-slate-400 uppercase font-bold">Balance Actual</p>
+                        <p class="text-xl font-black">$ <span class="balance-val">0.00</span></p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] text-slate-400 uppercase font-bold">Publicidad</p>
+                        <p class="text-xl font-black" id="ad-count">0</p>
+                    </div>
                 </div>
             </div>
 
             <div class="space-y-3">
-                <div onclick="tgOpen('https://t.me/eiber0822')" class="card-premium flex justify-between items-center cursor-pointer">
-                    <span class="font-bold text-sm">📢 Canal Oficial</span><span class="text-blue-500">❯</span>
+                <div onclick="tg.openLink('https://t.me/eiber0822')" class="bg-white p-4 rounded-2xl flex justify-between items-center border border-slate-100 shadow-sm">
+                    <span class="font-bold text-sm text-slate-700">📢 Canal de Soporte</span>
+                    <span class="text-blue-500 font-bold">❯</span>
                 </div>
-                <div onclick="tgOpen('https://portaltecnohoy.blogspot.com')" class="card-premium flex justify-between items-center cursor-pointer">
-                    <span class="font-bold text-sm">🌐 Portal Web</span><span class="text-blue-500">❯</span>
+                <div onclick="tg.openLink('https://portaltecnohoy.blogspot.com')" class="bg-white p-4 rounded-2xl flex justify-between items-center border border-slate-100 shadow-sm">
+                    <span class="font-bold text-sm text-slate-700">🌐 Portal Web</span>
+                    <span class="text-blue-500 font-bold">❯</span>
                 </div>
             </div>
         </div>
 
         <nav class="bottom-nav">
-            <div class="nav-item active" onclick="showTab('tab-home', this)">
-                <span class="text-2xl">⚡</span><span>INICIO</span>
+            <div class="nav-item active" onclick="changeTab('tab-home', this)">
+                <span class="text-2xl">⚡</span><span>HACK</span>
             </div>
-            <div class="nav-item" onclick="showTab('tab-withdraw', this)">
-                <span class="text-2xl">💳</span><span>RETIRO</span>
-            </div>
-            <div class="nav-item" onclick="showTab('tab-profile', this)">
+            <div class="nav-item" onclick="changeTab('tab-profile', this)">
                 <span class="text-2xl">👤</span><span>PERFIL</span>
+            </div>
+            <div class="nav-item" onclick="alert('Retiro mínimo: $10.00')">
+                <span class="text-2xl">💰</span><span>COBRAR</span>
             </div>
         </nav>
     </div>
@@ -163,70 +107,40 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.ready();
 
         let balance = parseFloat(localStorage.getItem('titan_balance')) || 0.00;
-        let adCount = parseInt(localStorage.getItem('titan_ads')) || 0;
-        const goal = 10.00;
+        let ads = parseInt(localStorage.getItem('titan_ads')) || 0;
 
-        function updateUI() {
-            // Actualizar textos de balance
-            document.querySelectorAll('.balance-text, .balance-txt').forEach(el => el.innerText = balance.toFixed(2));
-            document.getElementById('ad-total').innerText = adCount;
-
-            // Barra de Progreso
-            let percent = (balance / goal) * 100;
-            if (percent > 100) percent = 100;
-            document.getElementById('p-bar').style.width = percent + '%';
-
-            // Botón de Retiro
-            const btn = document.getElementById('btn-pay');
-            if (balance >= goal) {
-                btn.disabled = false;
-                btn.className = "w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-xs shadow-lg shadow-blue-200 active:scale-95 transition-all";
-                btn.innerText = "ENVIAR SOLICITUD DE PAGO";
-            }
-
-            // Nombre de Usuario
+        function updateAllUI() {
+            document.querySelectorAll('.balance-val').forEach(el => el.innerText = balance.toFixed(2));
+            document.getElementById('ad-count').innerText = ads;
             if (tg.initDataUnsafe.user) {
-                document.getElementById('u-name').innerText = tg.initDataUnsafe.user.first_name + " " + (tg.initDataUnsafe.user.last_name || "");
+                document.getElementById('user-display').innerText = tg.initDataUnsafe.user.first_name;
             } else {
-                document.getElementById('u-name').innerText = "TITAN USER";
+                document.getElementById('user-display').innerText = "TITAN USER";
             }
         }
 
-        function tgOpen(url) {
-            tg.openLink(url);
-        }
-
-        function mineVault() {
-            tgOpen('https://omg10.com/4/10663699'); // Link de Monetag
-            
-            // Simulación de validación
+        function openVault() {
+            tg.openLink('https://omg10.com/4/10663699');
             setTimeout(() => {
                 balance += 0.15;
-                adCount += 1;
+                ads += 1;
                 localStorage.setItem('titan_balance', balance);
-                localStorage.setItem('titan_ads', adCount);
-                updateUI();
-                alert("Bóveda abierta con éxito. +$0.15 acumulados.");
+                localStorage.setItem('titan_ads', ads);
+                updateAllUI();
+                alert("¡Felicidades! +$0.15 añadidos.");
             }, 3000);
         }
 
-        function showTab(id, el) {
+        function changeTab(id, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active-tab'));
             document.getElementById(id).classList.add('active-tab');
             el.classList.add('active-tab');
         }
 
-        window.onload = () => {
-            setTimeout(() => {
-                document.getElementById('splash').style.opacity = '0';
-                setTimeout(() => document.getElementById('splash').style.display = 'none', 600);
-            }, 2500);
-            updateUI();
-        };
+        updateAllUI();
     </script>
 </body>
 </html>
